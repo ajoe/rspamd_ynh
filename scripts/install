@@ -39,8 +39,6 @@ chown -R vmail:mail /etc/dovecot/global_script
 mkdir -p /usr/lib/dovecot/sieve
 cp ../conf/report-spam.sieve /usr/lib/dovecot/sieve/report-spam.sieve
 cp ../conf/report-ham.sieve /usr/lib/dovecot/sieve/report-ham.sieve
-sievec /usr/lib/dovecot/sieve/report-spam.sieve
-sievec /usr/lib/dovecot/sieve/report-ham.sieve
 cp ../conf/rspamd-learn-spam.sh /usr/lib/dovecot/sieve/rspamd-learn-spam.sh
 cp ../conf/rspamd-learn-ham.sh /usr/lib/dovecot/sieve/rspamd-learn-ham.sh
 chmod +x /usr/lib/dovecot/sieve/rspamd-learn-spam.sh /usr/lib/dovecot/sieve/rspamd-learn-ham.sh
