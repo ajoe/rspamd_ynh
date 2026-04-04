@@ -16,7 +16,10 @@ ynh_backup "/usr/lib/dovecot/sieve/rspamd-learn-ham.sh"
 
 ynh_backup "/etc/rspamd"
 
-ynh_backup "/etc/logrotate.d/$app"
+# logrotate config may not exist if it was never enabled
+if [ -f "/etc/logrotate.d/$app" ]; then
+    ynh_backup "/etc/logrotate.d/$app"
+fi
 
 #=================================================
 # END OF SCRIPT
