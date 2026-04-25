@@ -1,0 +1,47 @@
+# Suspicious / heavily abused TLDs commonly used by spam senders.
+# Format: one TLD per line, no leading dot.
+# Source: Spamhaus "world's most abused TLDs" + experience.
+click
+top
+xyz
+icu
+cyou
+quest
+sbs
+cfd
+fit
+buzz
+rest
+gives
+mom
+bond
+makeup
+wiki
+beauty
+hair
+skin
+art
+tk
+ml
+ga
+cf
+gq
+work
+zip
+mov
+country
+stream
+download
+loan
+review
+bid
+trade
+date
+party
+science
+faith
+racing
+men
+win
+cricket
+accountant

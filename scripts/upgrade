@@ -23,6 +23,13 @@ fi
 ynh_script_progression "Adding system configurations related to $app..."
 
 cp ../conf/redis.conf /etc/rspamd/local.d/redis.conf
+
+# Deploy custom rspamd configuration (aggressive spam filtering, blocklists, custom Lua rules)
+mkdir -p /etc/rspamd/local.d/maps.d /etc/rspamd/lua.local.d
+cp ../conf/rspamd/local.d/*.conf /etc/rspamd/local.d/
+cp ../conf/rspamd/local.d/maps.d/*.map /etc/rspamd/local.d/maps.d/
+cp ../conf/rspamd/lua.local.d/*.lua /etc/rspamd/lua.local.d/
+
 ynh_systemctl --service=rspamd --action="restart"
 
 # Add postfix configuration hook and regen postfix conf
