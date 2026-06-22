@@ -1,0 +1,3 @@
+# Hard-blocked sending IPs / netblocks (CIDR)
+# Score: 5.0 (see multimap.conf -> BLOCKED_RECEIVED_IP)
+213.108.199.0/24
