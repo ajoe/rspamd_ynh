@@ -104,6 +104,10 @@ rspamd_config.CHARSET_LANG_MISMATCH = {
 ----------------------------------------------------------------------
 rspamd_config.MID_BULK_PATTERN = {
     callback = function(task)
+        -- Don't penalise locally-submitted / authenticated mail (e.g. our own
+        -- contact forms and users sending via SMTP AUTH). Their random-looking
+        -- Message-IDs would otherwise trip this bulk-mailer heuristic.
+        if task:get_user() then return false end
         local mid = task:get_header('Message-ID')
         if not mid then return false end
         mid = mid:gsub('^<', ''):gsub('>$', '')
