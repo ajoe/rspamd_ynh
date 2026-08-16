@@ -1,0 +1,3 @@
+# Hard-blocked sender domains. Add full FQDNs only.
+# Score: 8.0 (see multimap.conf -> BLOCKED_SENDER_DOMAIN)
+axertione.click
