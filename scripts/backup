@@ -24,6 +24,11 @@ ynh_backup "/etc/rspamd/local.d/rbl.conf"
 ynh_backup "/etc/rspamd/local.d/maps.d"
 ynh_backup "/etc/rspamd/lua.local.d/custom_spam_rules.lua"
 
+# Local recursive resolver for rspamd
+ynh_backup "/etc/rspamd/local.d/options.inc"
+ynh_backup "/etc/unbound/unbound.conf.d/rspamd.conf"
+ynh_backup "/etc/default/unbound"
+
 ynh_backup "/etc/dovecot/yunohost.d/post-ext.d/rspamd-learning.conf"
 ynh_backup "/etc/dovecot/global_script/rspamd-spam-to-junk-folder.sieve"
 ynh_backup "/etc/dovecot/global_script/rspamd-spam-to-junk-folder.svbin"
