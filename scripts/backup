@@ -18,7 +18,6 @@ ynh_backup "/etc/rspamd/local.d/dkim_signing.conf"
 
 # Custom spam rules (aggressive scores, blocklists, custom Lua rules)
 ynh_backup "/etc/rspamd/local.d/actions.conf"
-ynh_backup "/etc/rspamd/local.d/dmarc.conf"
 ynh_backup "/etc/rspamd/local.d/groups.conf"
 ynh_backup "/etc/rspamd/local.d/multimap.conf"
 ynh_backup "/etc/rspamd/local.d/rbl.conf"

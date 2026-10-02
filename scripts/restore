@@ -43,7 +43,6 @@ ynh_restore "/etc/rspamd/local.d/dkim_signing.conf"
 
 # Custom spam rules (aggressive scores, blocklists, custom Lua rules)
 ynh_restore "/etc/rspamd/local.d/actions.conf"
-ynh_restore "/etc/rspamd/local.d/dmarc.conf"
 ynh_restore "/etc/rspamd/local.d/groups.conf"
 ynh_restore "/etc/rspamd/local.d/multimap.conf"
 ynh_restore "/etc/rspamd/local.d/rbl.conf"
