@@ -51,8 +51,20 @@ ynh_config_add --template="rspamd_classifier-bayes.conf" --destination="/etc/rsp
 ## Add dkim_signing conf
 ynh_config_add --template="rspamd_dkim_signing.conf" --destination="/etc/rspamd/local.d/dkim_signing.conf"
 
+## Add custom spam rules (aggressive scores, blocklists, custom Lua rules)
+mkdir -p /etc/rspamd/local.d/maps.d /etc/rspamd/lua.local.d
+ynh_config_add --template="rspamd_actions.conf" --destination="/etc/rspamd/local.d/actions.conf"
+ynh_config_add --template="rspamd_dmarc.conf" --destination="/etc/rspamd/local.d/dmarc.conf"
+ynh_config_add --template="rspamd_groups.conf" --destination="/etc/rspamd/local.d/groups.conf"
+ynh_config_add --template="rspamd_multimap.conf" --destination="/etc/rspamd/local.d/multimap.conf"
+ynh_config_add --template="rspamd_rbl.conf" --destination="/etc/rspamd/local.d/rbl.conf"
+ynh_config_add --template="rspamd_custom_spam_rules.lua" --destination="/etc/rspamd/lua.local.d/custom_spam_rules.lua"
+cp ../conf/rspamd_maps/*.map /etc/rspamd/local.d/maps.d/
+
 ## Set permissions
 chmod 644 /etc/rspamd/local.d/*
+chmod 755 /etc/rspamd/local.d/maps.d
+chmod 644 /etc/rspamd/local.d/maps.d/* /etc/rspamd/lua.local.d/custom_spam_rules.lua
 
 # Add dovecot conf
 ## Create sieve directories

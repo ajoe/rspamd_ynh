@@ -41,7 +41,18 @@ ynh_restore "/etc/rspamd/local.d/redis.conf"
 ynh_restore "/etc/rspamd/local.d/classifier-bayes.conf"
 ynh_restore "/etc/rspamd/local.d/dkim_signing.conf"
 
+# Custom spam rules (aggressive scores, blocklists, custom Lua rules)
+ynh_restore "/etc/rspamd/local.d/actions.conf"
+ynh_restore "/etc/rspamd/local.d/dmarc.conf"
+ynh_restore "/etc/rspamd/local.d/groups.conf"
+ynh_restore "/etc/rspamd/local.d/multimap.conf"
+ynh_restore "/etc/rspamd/local.d/rbl.conf"
+ynh_restore "/etc/rspamd/local.d/maps.d"
+ynh_restore "/etc/rspamd/lua.local.d/custom_spam_rules.lua"
+
 chmod 644 /etc/rspamd/local.d/*
+chmod 755 /etc/rspamd/local.d/maps.d
+chmod 644 /etc/rspamd/local.d/maps.d/* /etc/rspamd/lua.local.d/custom_spam_rules.lua
 
 ynh_restore "/etc/dovecot/yunohost.d/post-ext.d/rspamd-learning.conf"
 ynh_restore "/etc/dovecot/global_script/rspamd-spam-to-junk-folder.sieve"
