@@ -34,6 +34,8 @@ then
     ynh_safe_rm "/etc/dovecot/global_script/rspamd-report-spam.svbin"
     ynh_safe_rm "/etc/dovecot/global_script/rspamd-report-ham.sieve"
     ynh_safe_rm "/etc/dovecot/global_script/rspamd-report-ham.svbin"
+    # Remove leftover dovecot sieve config from previous versions of this fork
+    ynh_safe_rm "/etc/dovecot/yunohost.d/post-ext.d/antispam.conf"
 fi
 
 #=================================================
@@ -63,6 +65,14 @@ apt-mark auto "rspamd"
 #=================================================
 ynh_script_progression "Updating $app's configuration files..."
 
+# Deploy custom rspamd configuration (aggressive spam filtering, blocklists, custom Lua rules)
+mkdir -p /etc/rspamd/local.d/maps.d /etc/rspamd/lua.local.d
+cp ../conf/rspamd/local.d/*.conf /etc/rspamd/local.d/
+cp ../conf/rspamd/local.d/maps.d/*.map /etc/rspamd/local.d/maps.d/
+cp ../conf/rspamd/lua.local.d/*.lua /etc/rspamd/lua.local.d/
+
+ynh_systemctl --service=rspamd --action="restart"
+
 # Add postfix configuration hook and regen postfix conf
 ynh_config_add --template="yunohost_postfix_regenconf_hook" --destination="/usr/share/yunohost/hooks/conf_regen/99-postfix_rspamd"
 yunohost tools regen-conf postfix
@@ -86,40 +96,22 @@ ynh_config_add --template="rspamd_dkim_signing.conf" --destination="/etc/rspamd/
 chmod 644 /etc/rspamd/local.d/*
 
 # Add dovecot conf
-## Create sieve directories
-mkdir -p /etc/dovecot/global_script
-mkdir -p /etc/dovecot/imapsieve
-mkdir -p /usr/lib/dovecot/sieve-pipe
+## Deploy imap_sieve scripts for spam/ham learning
+mkdir -p /usr/lib/dovecot/sieve
+cp ../conf/report-spam.sieve /usr/lib/dovecot/sieve/report-spam.sieve
+cp ../conf/report-ham.sieve /usr/lib/dovecot/sieve/report-ham.sieve
+cp ../conf/rspamd-learn-spam.sh /usr/lib/dovecot/sieve/rspamd-learn-spam.sh
+cp ../conf/rspamd-learn-ham.sh /usr/lib/dovecot/sieve/rspamd-learn-ham.sh
+chmod +x /usr/lib/dovecot/sieve/rspamd-learn-spam.sh /usr/lib/dovecot/sieve/rspamd-learn-ham.sh
 
 ## Add the config file for spam handling
 if [[ $YNH_DEBIAN_VERSION == "bookworm" ]]; then
-    ynh_config_add --template="dovecot_rspamd-learning_bookworm.conf" --destination="/etc/dovecot/yunohost.d/post-ext.d/rspamd-learning.conf"
+    cp ../conf/dovecot_imap_sieve_bookworm.conf /etc/dovecot/yunohost.d/post-ext.d/antispam.conf
 elif [[ $YNH_DEBIAN_VERSION == "trixie" ]]; then
-    ynh_config_add --template="dovecot_rspamd-learning_trixie.conf" --destination="/etc/dovecot/yunohost.d/post-ext.d/rspamd-learning.conf"
+    cp ../conf/dovecot_imap_sieve_trixie.conf /etc/dovecot/yunohost.d/post-ext.d/antispam.conf
 fi
-ynh_systemctl --service=dovecot --action=restart
 
-## Add the sieve script to move Spam mails to the user's Junk folder
-ynh_config_add --template="dovecot_rspamd-spam-to-junk-folder.sieve" --destination="/etc/dovecot/global_script/rspamd-spam-to-junk-folder.sieve"
-sievec /etc/dovecot/global_script/rspamd-spam-to-junk-folder.sieve
-
-## Deploy imap_sieve scripts for spam/ham learning
-### Spam learning
-ynh_config_add --template="dovecot_rspamd-report-spam.sieve" --destination="/etc/dovecot/imapsieve/rspamd-report-spam.sieve"
-ynh_config_add --template="dovecot_rspamd-learn-spam.sh" --destination="/usr/lib/dovecot/sieve-pipe/rspamd-learn-spam.sh"
-sievec /etc/dovecot/imapsieve/rspamd-report-spam.sieve
-
-### Ham learning
-ynh_config_add --template="dovecot_rspamd-report-ham.sieve" --destination="/etc/dovecot/imapsieve/rspamd-report-ham.sieve"
-ynh_config_add --template="dovecot_rspamd-learn-ham.sh" --destination="/usr/lib/dovecot/sieve-pipe/rspamd-learn-ham.sh"
-sievec /etc/dovecot/imapsieve/rspamd-report-ham.sieve
-
-## Set permissions
-chown -R vmail:mail /etc/dovecot/global_script/ /etc/dovecot/imapsieve/
-chmod 750 /etc/dovecot/global_script/ /etc/dovecot/imapsieve/
-chmod 640 /etc/dovecot/global_script/* /etc/dovecot/imapsieve/*
-chmod 755 /usr/lib/dovecot/sieve-pipe/
-chmod 755 /usr/lib/dovecot/sieve-pipe/*
+ynh_systemctl --service=dovecot --action="restart"
 
 #=================================================
 # REAPPLY SYSTEM CONFIGURATION
