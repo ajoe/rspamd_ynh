@@ -24,6 +24,11 @@ ynh_backup "/etc/rspamd/local.d/rbl.conf"
 ynh_backup "/etc/rspamd/local.d/maps.d"
 ynh_backup "/etc/rspamd/lua.local.d/custom_spam_rules.lua"
 
+# ARC signing, greylisting exceptions and the outbound/own domain whitelists
+ynh_backup "/etc/rspamd/local.d/arc.conf"
+ynh_backup "/etc/rspamd/local.d/greylist-whitelist-domains.inc"
+ynh_backup "/etc/rspamd/local.d/settings.conf"
+
 # Local recursive resolver for rspamd
 ynh_backup "/etc/rspamd/local.d/options.inc"
 ynh_backup "/etc/unbound/unbound.conf.d/rspamd.conf"

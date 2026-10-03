@@ -4,6 +4,7 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
+source _common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -44,6 +45,14 @@ done
 
 # Former versions of this fork forced the action on DMARC quarantine/reject, which hit mailing lists
 ynh_safe_rm "/etc/rspamd/local.d/dmarc.conf"
+
+# Take over the domains of a whitelist.conf written by hand before it was managed by the app
+if [[ -z "${dkim_whitelist_domains:-}" && -e "/etc/rspamd/local.d/whitelist.conf" ]]; then
+    dkim_whitelist_domains=$(sed -n '/domains *= *\[/,/\]/p' /etc/rspamd/local.d/whitelist.conf | grep -o '"[^"]*"' | tr -d '"' | paste -sd,)
+    if [[ -n "$dkim_whitelist_domains" ]]; then
+        ynh_app_setting_set --key=dkim_whitelist_domains --value="$dkim_whitelist_domains"
+    fi
+fi
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
@@ -98,6 +107,13 @@ ynh_config_add --template="rspamd_groups.conf" --destination="/etc/rspamd/local.
 ynh_config_add --template="rspamd_multimap.conf" --destination="/etc/rspamd/local.d/multimap.conf"
 ynh_config_add --template="rspamd_rbl.conf" --destination="/etc/rspamd/local.d/rbl.conf"
 ynh_config_add --template="rspamd_custom_spam_rules.lua" --destination="/etc/rspamd/lua.local.d/custom_spam_rules.lua"
+
+## Add ARC signing, greylisting exceptions and the outbound/own domain whitelists
+ynh_config_add --template="rspamd_arc.conf" --destination="/etc/rspamd/local.d/arc.conf"
+ynh_config_add --template="rspamd_greylist-whitelist-domains.inc" --destination="/etc/rspamd/local.d/greylist-whitelist-domains.inc"
+ynh_config_add --template="rspamd_settings.conf" --destination="/etc/rspamd/local.d/settings.conf"
+_add_dkim_whitelist_conf
+
 ### Maps are maintained on the server, only ship the ones that don't exist yet
 for map in ../conf/rspamd_maps/*.map; do
     [[ -e "/etc/rspamd/local.d/maps.d/$(basename "$map")" ]] || cp "$map" /etc/rspamd/local.d/maps.d/

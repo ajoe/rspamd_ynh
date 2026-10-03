@@ -36,6 +36,12 @@ ynh_safe_rm "/etc/rspamd/local.d/rbl.conf"
 ynh_safe_rm "/etc/rspamd/local.d/maps.d"
 ynh_safe_rm "/etc/rspamd/lua.local.d/custom_spam_rules.lua"
 
+# ARC signing, greylisting exceptions and the outbound/own domain whitelists
+ynh_safe_rm "/etc/rspamd/local.d/arc.conf"
+ynh_safe_rm "/etc/rspamd/local.d/greylist-whitelist-domains.inc"
+ynh_safe_rm "/etc/rspamd/local.d/settings.conf"
+ynh_safe_rm "/etc/rspamd/local.d/whitelist.conf"
+
 # Remove the local recursive resolver for rspamd
 ynh_safe_rm "/etc/rspamd/local.d/options.inc"
 ynh_safe_rm "/etc/unbound/unbound.conf.d/rspamd.conf"

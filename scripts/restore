@@ -4,6 +4,7 @@
 # IMPORT GENERIC HELPERS
 #=================================================
 
+source ../settings/scripts/_common.sh
 source /usr/share/yunohost/helpers
 
 #=================================================
@@ -49,6 +50,12 @@ ynh_restore "/etc/rspamd/local.d/multimap.conf"
 ynh_restore "/etc/rspamd/local.d/rbl.conf"
 ynh_restore "/etc/rspamd/local.d/maps.d"
 ynh_restore "/etc/rspamd/lua.local.d/custom_spam_rules.lua"
+
+# ARC signing, greylisting exceptions and the outbound/own domain whitelists
+ynh_restore "/etc/rspamd/local.d/arc.conf"
+ynh_restore "/etc/rspamd/local.d/greylist-whitelist-domains.inc"
+ynh_restore "/etc/rspamd/local.d/settings.conf"
+_add_dkim_whitelist_conf
 
 # Local recursive resolver for rspamd
 ynh_restore "/etc/rspamd/local.d/options.inc"
