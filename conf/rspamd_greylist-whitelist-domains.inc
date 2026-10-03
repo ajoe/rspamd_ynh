@@ -1,27 +1,33 @@
-# Domains (including subdomains) for which greylisting is skipped.
-# Large email service providers and known-good senders — several of them
-# do not retry reliably after a temporary failure, so greylisting them
-# risks losing legitimate mail. (2026-09-16)
-microsoft.com
+# Senders for which greylisting is skipped. Large email service providers
+# deliver from big server pools and often retry from a different network, so
+# greylisting them risks delaying or losing legitimate mail. (2026-09-16)
+#
+# rspamd matches these entries against the reverse DNS name of the connecting
+# server and its registered domain, NOT against the sender address. Entries are
+# therefore the domains the providers' outgoing servers are named after, checked
+# against PTR records of their SPF ranges. (2026-10-03: the former sender domains
+# like gmail.com, hotmail.com, icloud.com or mailgun.org never matched.)
+
+# Microsoft: Outlook.com, Hotmail, Microsoft 365 (*.outbound.protection.outlook.com)
 outlook.com
-hotmail.com
-live.com
-msn.com
-office365.com
-office.com
+# Google: Gmail, Google Workspace (mail-*.google.com, *.1e100.net)
 google.com
-googlemail.com
-gmail.com
+1e100.net
+# Yahoo and AOL (*.mail.yahoo.com)
 yahoo.com
-ymail.com
-aol.com
-icloud.com
+# Apple iCloud (*.me.com, *.eps.apple.com)
 me.com
-mac.com
-sfcustomeremail.com
-salesforce.com
-sfdc.net
+apple.com
+
+# Email service providers
+# SendGrid (*.sendgrid.net)
 sendgrid.net
-mandrill.com
-postmarkapp.com
-mailgun.org
+# Mailgun (*.mailgun.net)
+mailgun.net
+# Mandrill (*.mandrillapp.com)
+mandrillapp.com
+# Postmark (*.mtasv.net)
+mtasv.net
+# Salesforce: Marketing Cloud (*.mta.exacttarget.com), core (*.mta.salesforce.com, not verified)
+exacttarget.com
+salesforce.com
