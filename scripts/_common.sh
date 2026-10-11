@@ -19,8 +19,12 @@ _add_dkim_whitelist_conf() {
 # Ensure /var/lib/unbound/root.key exists before running unbound-checkconf.
 # The Debian unbound package's postinst does not create it on some releases;
 # unbound-checkconf with auto-trust-anchor-file then fails with a fatal error.
-# We fetch the IANA root-anchors.xml and extract the base64 DNSKEY PublicKey
-# of the most recently valid (validFrom latest) key.
+# We fetch the IANA root-anchors.xml and extract the base64 DNSKEY RDATA
+# (the <PublicKey> field) of the most recently added valid anchor, then write
+# it in the format unbound expects:
+#   <domain> <ttl> <class> <type> <flags> <protocol> <algorithm> <base64>
+# The flags/protocol/algorithm values come from the XML <Flags> and <Algorithm>
+# elements (not from the base64 itself, which packs them differently).
 _ensure_unbound_root_key() {
     if [[ -e "/var/lib/unbound/root.key" ]]; then
         return
@@ -31,12 +35,18 @@ _ensure_unbound_root_key() {
     tmp_xml=$(mktemp)
     if wget -q -O "$tmp_xml" https://data.iana.org/root-anchors/root-anchors.xml \
        || get -q -f "$tmp_xml" https://data.iana.org/root-anchors/root-anchors.xml; then
-        # The XML has multiple <KeyDigest> entries each with a <PublicKey>
-        # child on one line. Take the last one (most recently added anchor).
-        local root_key
-        root_key=$(sed -n 's|.*<PublicKey>\(.*\)</PublicKey>.*|\1|p' "$tmp_xml" | tail -1)
-        if [[ -n "$root_key" ]]; then
-            printf '%s\n' "$root_key" > /var/lib/unbound/root.key
+        # Extract the last <KeyDigest> block that has a <PublicKey> child.
+        # We need: PublicKey (base64 RDATA), Flags, Algorithm from the XML.
+        local pubkey flags algo
+        # The last block with a PublicKey is the most recently added anchor.
+        # Use awk to capture the whole last block.
+        local last_block
+        last_block=$(awk '/<KeyDigest[^>]*>/{block=""} {block=block $0 "\n"} /<\/KeyDigest>/{if(block ~ /<PublicKey>/) last=block} END{printf "%s", last}' "$tmp_xml")
+        pubkey=$(sed -n 's|.*<PublicKey>\(.*\)</PublicKey>.*|\1|p' <<< "$last_block")
+        flags=$(sed -n 's|.*<Flags>\(.*\)</Flags>.*|\1|p' <<< "$last_block")
+        algo=$(sed -n 's|.*<Algorithm>\(.*\)</Algorithm>.*|\1|p' <<< "$last_block")
+        if [[ -n "$pubkey" && -n "$flags" && -n "$algo" ]]; then
+            printf '. 3600 IN DNSKEY %s 3 %s %s\n' "$flags" "$algo" "$pubkey" > /var/lib/unbound/root.key
             chmod 644 /var/lib/unbound/root.key
         fi
     fi
