@@ -3,5 +3,8 @@
 # - don't register unbound in /etc/resolv.conf through resolvconf
 # - don't make unbound forward to the system's upstream resolvers, rspamd needs
 #   full recursion (see /etc/resolvconf/update.d/unbound)
+# Let unbound bootstrap its root trust anchor from /var/lib/unbound/root.key
+# (populated by the install/upgrade scripts).
 RESOLVCONF=false
 USE_RESOLVCONF_FORWARDS=false
+USE_AUTO_TRUST_ANCHOR=true

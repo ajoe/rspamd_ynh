@@ -130,6 +130,7 @@ done
 ynh_config_add --template="unbound_default" --destination="/etc/default/unbound"
 ynh_config_add --template="unbound_rspamd.conf" --destination="/etc/unbound/unbound.conf.d/rspamd.conf"
 chmod 644 /etc/default/unbound /etc/unbound/unbound.conf.d/rspamd.conf
+_ensure_unbound_root_key
 unbound-checkconf
 ### The package starts unbound on port 53 right after installation, where dnsmasq already listens
 systemctl reset-failed unbound 2>/dev/null || true

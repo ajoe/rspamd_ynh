@@ -62,6 +62,10 @@ ynh_restore "/etc/rspamd/local.d/options.inc"
 ynh_restore "/etc/unbound/unbound.conf.d/rspamd.conf"
 ynh_restore "/etc/default/unbound"
 
+# The Debian unbound package may not have created the root trust anchor; unbound-checkconf
+# would fail without it.
+_ensure_unbound_root_key
+
 chmod 644 /etc/rspamd/local.d/*
 chmod 755 /etc/rspamd/local.d/maps.d
 chmod 644 /etc/rspamd/local.d/maps.d/* /etc/rspamd/lua.local.d/custom_spam_rules.lua
