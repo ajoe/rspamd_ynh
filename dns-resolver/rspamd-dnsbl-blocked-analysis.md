@@ -269,7 +269,7 @@ The same queries against a local recursive resolver (after option A below) shoul
 the "listed" answers:
 
 ```bash
-dig +short -p 5353 @127.0.0.1 dbltest.com.dbl.spamhaus.org
+dig +short -p 5354 @127.0.0.1 dbltest.com.dbl.spamhaus.org
 ```
 
 ## Options
@@ -282,7 +282,7 @@ Unbound runs as a recursive resolver on a non-standard port, so it does not coll
 ```
 # /etc/unbound/unbound.conf.d/rspamd.conf
 server:
-    interface: 127.0.0.1@5353
+    interface: 127.0.0.1@5354
     access-control: 127.0.0.0/8 allow
     prefetch: yes
 ```
@@ -290,7 +290,7 @@ server:
 ```
 # /etc/rspamd/local.d/options.inc
 dns {
-  nameserver = ["127.0.0.1:5353"];
+  nameserver = ["127.0.0.1:5354"];
 }
 ```
 
@@ -314,7 +314,7 @@ dns {
 - **backup / restore:** include both files.
 - **Service check:** register `unbound` as a YunoHost service, so that `yunohost service`
   shows its state.
-- **Check after deploy:** the `dig -p 5353` tests above, and new `*_BLOCKED*` counts
+- **Check after deploy:** the `dig -p 5354` tests above, and new `*_BLOCKED*` counts
   dropping to zero in the Rspamd log.
 
 ### B. Change YunoHost's system resolvers
@@ -363,21 +363,21 @@ Deployed on 2026-10-03 as rspamd_ynh fork 4.2.1~ynh5 (`yunohost app upgrade`).
 **Upgrade log:** one expected warning, `Could not execute systemctl: at
 /usr/bin/deb-systemd-invoke line 148`. The `unbound` package starts the service right
 after installation on port 53, where `dnsmasq` already listens. The package tolerates the
-failed start, and the upgrade script then restarts Unbound on port 5353.
+failed start, and the upgrade script then restarts Unbound on port 5354.
 
 **Test entries through the local resolver:**
 
 ```
-$ dig +short -p 5353 @127.0.0.1 dbltest.com.dbl.spamhaus.org     -> 127.0.1.2   (listed, works)
-$ dig +short -p 5353 @127.0.0.1 test.uribl.com.multi.uribl.com   -> 127.0.0.14  (listed, works)
-$ dig +short -p 5353 @127.0.0.1 2.0.0.127.list.dnswl.org         -> 127.0.10.0  (documented test answer, works)
+$ dig +short -p 5354 @127.0.0.1 dbltest.com.dbl.spamhaus.org     -> 127.0.1.2   (listed, works)
+$ dig +short -p 5354 @127.0.0.1 test.uribl.com.multi.uribl.com   -> 127.0.0.14  (listed, works)
+$ dig +short -p 5354 @127.0.0.1 2.0.0.127.list.dnswl.org         -> 127.0.10.0  (documented test answer, works)
 ```
 
 **System state:**
 
 - `unbound`, `rspamd` and `dnsmasq` are all `active`.
 - `/etc/resolv.conf` still points to `127.0.0.1` (`dnsmasq`). The system DNS is unchanged.
-- `/etc/rspamd/local.d/options.inc` points Rspamd to `127.0.0.1:5353`.
+- `/etc/rspamd/local.d/options.inc` points Rspamd to `127.0.0.1:5354`.
 
 ## References
 
