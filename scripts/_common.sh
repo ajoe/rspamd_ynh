@@ -22,7 +22,7 @@ _add_dkim_whitelist_conf() {
 _ensure_unbound_root_key() {
     if [[ ! -e "/var/lib/unbound/root.key" ]]; then
         mkdir -p /var/lib/unbound
-        ynh_log "info" "Fetching the IANA root trust anchor for unbound..."
+        ynh_print_info "Fetching the IANA root trust anchor for unbound..."
         local tmp_anchors
         tmp_anchors=$(mktemp)
         if get -q -f "$tmp_anchors" https://data.iana.org/root-anchors/root-anchors.csv 2>/dev/null; then
