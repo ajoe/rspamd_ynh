@@ -29,12 +29,12 @@ _ensure_unbound_root_key() {
     ynh_print_info "Fetching the IANA root trust anchor for unbound..."
     local tmp_xml
     tmp_xml=$(mktemp)
-    if get -q -f "$tmp_xml" https://data.iana.org/root-anchors/root-anchors.xml 2>/dev/null \
-       || wget -q -O "$tmp_xml" https://data.iana.org/root-anchors/root-anchors.xml; then
-        # The XML has multiple <KeyDigest> entries; take the last one that
-        # has a <PublicKey> child (the most recently added valid anchor).
+    if wget -q -O "$tmp_xml" https://data.iana.org/root-anchors/root-anchors.xml \
+       || get -q -f "$tmp_xml" https://data.iana.org/root-anchors/root-anchors.xml; then
+        # The XML has multiple <KeyDigest> entries each with a <PublicKey>
+        # child on one line. Take the last one (most recently added anchor).
         local root_key
-        root_key=$(xmllint --xpath "//*[local-name()='PublicKey']/text()" "$tmp_xml" 2>/dev/null | tail -1)
+        root_key=$(sed -n 's|.*<PublicKey>\(.*\)</PublicKey>.*|\1|p' "$tmp_xml" | tail -1)
         if [[ -n "$root_key" ]]; then
             printf '%s\n' "$root_key" > /var/lib/unbound/root.key
             chmod 644 /var/lib/unbound/root.key
